@@ -18,35 +18,41 @@ type FastaReader struct {
 	seenHeader  bool
 	header      []byte
 	sequence    []byte
+	entry       *Fasta
 }
 
-func (f *FastaReader) NextSeq() (*Fasta, error) {
+func (f *FastaReader) NextEntry() *Fasta {
+	return f.entry
+}
+
+func (f *FastaReader) HasEntry() bool {
 	for {
 		line, err := f.reader.ReadSlice('\n')
 		if err != nil {
 			if !f.seenHeader {
 				f.seenHeader = true
-				return &Fasta{
+				f.entry = &Fasta{
 					Id: f.header, Sequence: f.sequence,
-				}, nil
+				}
+				return true
 			}
-			return nil, err
+			return false
 		}
 		if match := f.fastaRegExp.FindSubmatch(line); match != nil {
 			if !f.seenHeader {
 				f.header = match[1]
 				f.seenHeader = true
 			} else {
-				fasta := &Fasta{Id: f.header, Sequence: f.sequence}
+				f.entry = &Fasta{Id: f.header, Sequence: f.sequence}
 				f.header = match[1]
 				f.seenHeader = false
-				return fasta, nil
+				return true
 			}
 		} else {
 			f.sequence = append(f.sequence, bytes.TrimSuffix(line, []byte("\n"))...)
 		}
 	}
-	return nil, nil
+	return false
 }
 
 func NewFastaReader(file string) *FastaReader {
