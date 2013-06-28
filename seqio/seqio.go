@@ -3,6 +3,8 @@ package seqio
 import (
 	"bufio"
 	"bytes"
+	"fmt"
+	"io"
 	"os"
 	"regexp"
 )
@@ -19,6 +21,7 @@ type FastaReader struct {
 	header      []byte
 	sequence    []byte
 	entry       *Fasta
+	exhausted   bool
 }
 
 func (f *FastaReader) NextEntry() *Fasta {
@@ -28,9 +31,9 @@ func (f *FastaReader) NextEntry() *Fasta {
 func (f *FastaReader) HasEntry() bool {
 	for {
 		line, err := f.reader.ReadSlice('\n')
-		if err != nil {
-			if !f.seenHeader {
-				f.seenHeader = true
+		if err == io.EOF {
+			if !f.exhausted {
+				f.exhausted = true
 				f.entry = &Fasta{
 					Id: f.header, Sequence: f.sequence,
 				}
@@ -38,15 +41,20 @@ func (f *FastaReader) HasEntry() bool {
 			}
 			return false
 		}
-		if match := f.fastaRegExp.FindSubmatch(line); match != nil {
-			if !f.seenHeader {
-				f.header = match[1]
-				f.seenHeader = true
-			} else {
-				f.entry = &Fasta{Id: f.header, Sequence: f.sequence}
-				f.header = match[1]
-				f.seenHeader = false
-				return true
+		if bytes.HasPrefix(line, []byte(">")) {
+			if match := f.fastaRegExp.FindSubmatch(line); match != nil {
+				fmt.Printf("header %s\n", match[1])
+				if !f.seenHeader {
+					f.header = match[1]
+					f.seenHeader = true
+				} else {
+					fmt.Printf("sequence %s\n", f.sequence)
+					f.entry = &Fasta{Id: f.header, Sequence: f.sequence}
+					f.header = match[1]
+					f.seenHeader = false
+					f.sequence = []byte{}
+					return true
+				}
 			}
 		} else {
 			f.sequence = append(f.sequence, bytes.TrimSuffix(line, []byte("\n"))...)

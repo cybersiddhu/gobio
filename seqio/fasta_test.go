@@ -1,6 +1,7 @@
 package seqio
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,6 +12,7 @@ func TestMultiFasta(t *testing.T) {
 	if err != nil {
 		t.Error("Could not get current direcotry")
 	}
+	fmt.Fprintf(os.Stderr, "got path %s\n", dir)
 
 	mfasta := filepath.Join(dir, "multi.fa")
 	reader := NewFastaReader(mfasta)
@@ -20,7 +22,7 @@ func TestMultiFasta(t *testing.T) {
 		}
 		entry := reader.NextEntry()
 		if entry == nil {
-			t.Error("Did not get expected iteration")
+			t.Error("Did not get expected entry")
 		}
 
 	}
