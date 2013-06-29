@@ -1,3 +1,4 @@
+//generic namespace shared by all biological sequence input and output handlers
 package seqio
 
 import (
@@ -8,14 +9,43 @@ import (
 	"regexp"
 )
 
+//A very barebone and simple Fasta format sequence file parser. Currently, it parses and
+//returns the Id(header) and sequence. This is mostly working concept, however could be
+//easily extended in future.
+// Example
+//  package main
+//  import (
+//		"fmt"
+//		"github.com/cybersiddhu/gobio/seqio"
+//		"os"
+//	)
+//
+//  func main() {
+//		 f,err := os.Open(os.Args[1])			
+//		 if err != nil {
+//				panic(err.Error())
+//		 }
+//		 defer f.Close()
+//		 r := seqio.NewfastaReader(f)
+//		 for r.HasEntry() {
+//				fasta := r.NextEentry()
+//				fmt.Printf("id:%s\nSequence:%s\n",f.Id,f.Sequence)
+//		 }
+//  }
+
+
+//A type for holding a single fasta record
 type Fasta struct {
-	Id       []byte
-	Sequence []byte
+	Id       []byte //sequence id or header immediately followd by ">" symbol
+	Sequence []byte //The entire sequence
 }
 
+//A data type for parsing one entry at a time
 type FastaReader struct {
-	reader      *bufio.Reader
-	fastaRegExp *regexp.Regexp
+	reader      *bufio.Reader //pointer to a buffered reader
+//regular expression for parsing the header. For the time being, it will match any
+//non-whitespace character starting right after the ">" sign in the header.
+	fastaRegExp *regexp.Regexp 
 	seenHeader  bool
 	header      []byte
 	sequence    []byte
@@ -23,10 +53,13 @@ type FastaReader struct {
 	exhausted   bool
 }
 
+//Returns the next fasta entry 
 func (f *FastaReader) NextEntry() *Fasta {
 	return f.entry
 }
 
+
+//Checks for next fasta entry. Should be called before reading the next entry 
 func (f *FastaReader) HasEntry() bool {
 	for {
 		line, err := f.reader.ReadSlice('\n')
@@ -59,6 +92,7 @@ func (f *FastaReader) HasEntry() bool {
 	return false
 }
 
+//Create a new Fastareader
 func NewFastaReader(file string) *FastaReader {
 	reader, err := os.Open(file)
 	if err != nil {
