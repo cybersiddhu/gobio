@@ -3,7 +3,6 @@ package seqio
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"regexp"
@@ -43,15 +42,12 @@ func (f *FastaReader) HasEntry() bool {
 		}
 		if bytes.HasPrefix(line, []byte(">")) {
 			if match := f.fastaRegExp.FindSubmatch(line); match != nil {
-				fmt.Printf("header %s\n", match[1])
 				if !f.seenHeader {
 					f.header = match[1]
 					f.seenHeader = true
 				} else {
-					fmt.Printf("sequence %s\n", f.sequence)
 					f.entry = &Fasta{Id: f.header, Sequence: f.sequence}
 					f.header = match[1]
-					f.seenHeader = false
 					f.sequence = []byte{}
 					return true
 				}
