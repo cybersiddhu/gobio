@@ -1,17 +1,8 @@
-//generic namespace shared by all biological sequence input and output handlers
-package seqio
-
-import (
-	"bufio"
-	"bytes"
-	"io"
-	"os"
-	"regexp"
-)
-
-//A very barebone and simple Fasta format sequence file parser. Currently, it parses and
-//returns the Id(header) and sequence. This is mostly working concept, however could be
-//easily extended in future.
+//Package seqio is a generic namespace shared by all biological sequence input and output
+//handlers.
+//This package contain a very barebone and simple Fasta format sequence file parser. 
+// Currently, it parses and returns the Id(header) and sequence. 
+// This is mostly working concept, however could be easily extended in future.
 // Example
 //  package main
 //  import (
@@ -32,6 +23,16 @@ import (
 //				fmt.Printf("id:%s\nSequence:%s\n",f.Id,f.Sequence)
 //		 }
 //  }
+package seqio
+
+import (
+	"bufio"
+	"bytes"
+	"io"
+	"os"
+	"regexp"
+)
+
 
 
 //A type for holding a single fasta record
