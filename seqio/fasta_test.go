@@ -1,4 +1,4 @@
-package seqio
+package fasta
 
 import (
 	"os"
