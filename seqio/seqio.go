@@ -12,12 +12,7 @@
 //	)
 //
 //  func main() {
-//		 f,err := os.Open(os.Args[1])			
-//		 if err != nil {
-//				panic(err.Error())
-//		 }
-//		 defer f.Close()
-//		 r := seqio.NewfastaReader(f)
+//		 r := seqio.NewFastaReader(os.Args[1])
 //		 for r.HasEntry() {
 //				fasta := r.NextEentry()
 //				fmt.Printf("id:%s\nSequence:%s\n",f.Id,f.Sequence)
