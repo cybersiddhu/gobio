@@ -1,13 +1,14 @@
 package fasta
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
 )
 
-var headerRgxp = regexp.MustCompile(`^\S+$`)
+var headerRgxp = regexp.MustCompile(`^\w{1,4}`)
 var seqRgxp = regexp.MustCompile(`^[A-Z]+$`)
 
 func TestSingleFasta(t *testing.T) {
@@ -19,14 +20,14 @@ func TestSingleFasta(t *testing.T) {
 	mfasta := filepath.Join(dir, "single.fa")
 	reader := NewFastaReader(mfasta)
 	if !reader.HasEntry() {
-		t.Error("Did not get expected iteration")
+		t.Errorf("Did not get expected iteration %s", err)
 	}
 	entry := reader.NextEntry()
 	if entry == nil {
 		t.Error("Did not get expected entry")
 	}
 
-	if !headerRgxp.Match(entry.Id) {
+	if !bytes.HasPrefix(entry.Id, []byte("tr|Q95Q25")) {
 		t.Error("Expected to match header")
 	}
 
