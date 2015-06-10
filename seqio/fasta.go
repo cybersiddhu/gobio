@@ -70,11 +70,11 @@ func (f *FastaReader) HasEntry() bool {
 		}
 		if bytes.HasPrefix(line, []byte(">")) {
 			if !f.seenHeader {
-				f.header = line[1:len(line)]
+				f.header = line[1 : len(line)-1]
 				f.seenHeader = true
 			} else {
 				f.fasta = &Fasta{Id: f.header, Sequence: f.sequence}
-				f.header = line[1:len(line)]
+				f.header = line[1 : len(line)-1]
 				f.sequence = []byte{}
 				return true
 			}
