@@ -19,7 +19,7 @@
 //			fmt.Printf("id:%s\nSequence:%s\n",f.Id,f.Sequence)
 //		 }
 //  }
-package fasta
+package seqio
 
 import (
 	"bufio"
